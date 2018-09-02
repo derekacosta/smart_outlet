@@ -29,7 +29,7 @@ function wavingGrass() {
 		  ctx.canvas.height = window.innerHeight;
 		  img.onload = function() {
 		    ctx.drawImage(img, 0, 0,window.innerWidth,window.innerHeight);
-		    iw = 500;
+		    iw = 2000;
 		  };
 		  img.style.height = '800px';
 		  // img.style.width = '900px';
