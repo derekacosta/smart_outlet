@@ -1,211 +1,197 @@
 <html>
-    <head>
-        <title>COLORS</title>
-      <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
 
-<style>
+<head>
+    <title>COLORS</title>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
 
-body {
-	margin: auto;
-  position: relative;
-  text-align: center;
-  top: 10%;
-  width: 20%;  
-}
-
-#stoplight {
-    width: 150px; 
-    border-style: solid;
-    border-radius: 30px;
-    background: #FFCC33;
-    margin-left: 64px;
-}
-    
-.circle {
-  width: 85px;
-  height: 85px;
-  border-radius: 85px;
-  border: 3px solid black;
-  margin: 30px auto;
-  background-color: black;
-}
-
-#time {
-    background: transparent;
-    margin-top: 31px;
-    width: 83px;
-}
-
-.button {
-    background-color: grey;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-    border-radius: 5px;
-    display: inline-block;
-    color: White;
-    font-size: 30px;
-    margin: 1px;
-    font-family: "Courier New";
-}
-
-</style>
-    </head>
-    <body>
-        <!-- div id="stoplight-buttons">
-            
-          <div id="stop" class="button">Stop</div>  
-          <div id= "slow" class="button">Slow</div>  
-          <div id="go" class="button">Go</div>  
-          <div id="clear" class="button">Clear</div>  
-            
-        </div> -->
-        
-        <br>
-        
-        
-        <div id="stoplight">
-	    <h3  id="count"></h3>
-            <div id="redLight" class="circle"></div>
-	    <div id="slowLight" class="circle"><input id="time" placeholder="DD:HH:MM:SS"></div>
-            <div id="goLight" class="circle"></div>
-            
-        </div>
-        
-    </body>
-
-	<script>
-   $(document).ready(function() {
-	document.getElementById("time").style.visibility = "hidden";
-     // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyBSyfqxU2cvGUYETjuUZbCwHcoq_1qYHlM",
-        authDomain: "plant-lights.firebaseapp.com",
-        databaseURL: "https://plant-lights.firebaseio.com",
-        projectId: "plant-lights",
-        storageBucket: "",
-        messagingSenderId: "666739629417"
-      };
-      firebase.initializeApp(config);
-
-      var database = firebase.database();
-
-
-      function writeData(choice, time) {
-          firebase.database().ref('plant-lights').set({
-            lights: choice,
-            time: time,
-          });
-        };
-   	var counter = 0; 
-
-       function readData(){
-          let state = firebase.database().ref('plant-lights');
-          state.on('child_added', (data) => {
-	      counter = data.val().time;
-              init(data.val());
-                //Do something with the data
-	      console.log(counter);
-          });
-	       return state;
-        };
-    
-        function init(state){
-              if(state == "OFF"){
-                // switchstoplight();
-                $("#redLight").css("background-color", "red");    
-              }
-              else if(state == "ON"){
-                // switchgolight();
-                $("#goLight").css("background-color", "green");
-		      console.log(counter);
-		      if(Number(counter>0)){
-			      timer(Number(counter));
-		      }
-              }
-              else if(state == "TIME"){
-		$("#slowLight").css("background-color", "yellow");
-		document.getElementById("time").style.visibility = "visible";
-              }
-            };
-
-        readData();
-
-
-    $("#redLight").click(switchstoplight);
-    $("#slowLight").click(switchslowlight);
-    $("#goLight").click(switchgolight);
-    // $("#clear").click(clear);
-    var input = document.getElementById("time");
-	input.addEventListener("keyup", function(event) {
-	       event.preventDefault();
-	       if (event.keyCode === 13) {
-		       var re =  /\s*:\s*/;
-		       var time = event.target.value.split(re);
-        time = ((Number(time[0])*86400)+(Number(time[1])*3600)+(Number(time[2])*60)+Number(time[3])) * 1000;
-	           timer(time);
-	       }
-	});
-    
-    
-    function switchstoplight() {
-	writeData("OFF", 0)
-        clear();
-        $("#redLight").css("background-color", "red");
-        document.title = 'RED';
-        // window.history.pushState("RED", "Title", "/?light=OFF");
+    <style>
+        body {
+            margin: auto;
+            position: relative;
         }
-    
-    function switchslowlight() {
-        clear();
-	document.getElementById("time").style.visibility = "visible";
-        $("#slowLight").css("background-color", "yellow");
-        document.title = 'YELLOW';
-         // window.history.pushState("RED", "Title", "/?light=null");
-    }
-    
-   function switchgolight() {
-	writeData("ON", 0)
-        clear();
-        $("#goLight").css("background-color", "green");
-        document.title = 'GREEN';
-        // window.history.pushState("RED", "Title", "/?light=ON");
-   }
-    
-   function clear() {
-        $("#redLight").css("background-color", "black");
-        $("#slowLight").css("background-color", "black");
-        $("#goLight").css("background-color", "black");
-	document.getElementById("time").style.visibility = "hidden";
-   }
 
-   function timer(time) {
-	var x = setInterval(function() {
-	     writeData("ON", time)
-	     readData();
-	     var now = new Date().valueOf();
-	     var distance = counter 
-	     time = time - 1000;
-		console.log(distance)
-	     // Time calculations for days, hours, minutes and seconds
-	    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000); 
-	     // Display the result in the element with id="demo"
-	     document.getElementById("count").innerHTML = days + "d " + hours + "h "
-	     + minutes + "m " + seconds + "s ";
+        #stoplight {
+            position: absolute;
+            width: 150px;
+            border-style: solid;
+            border-radius: 30px;
+            background: #FFCC33;
+            margin-left: 264px;
+            margin-top: 50px;
+        }
 
-	     // If the count down is finished, write some text 
-	     if (distance < 0) {
-		     clearInterval(x);
-		     document.getElementById("count").style.display = "none";
-			switchstoplight();						
-		  }
-	 }, 1000);
-	}
-  });
+        .circle {
+            width: 85px;
+            height: 85px;
+            border-radius: 85px;
+            border: 3px solid black;
+            margin: 30px auto;
+            background-color: black;
+        }
+
+        #time {
+            background: transparent;
+            margin-top: 31px;
+            width: 83px;
+        }
+
+        canvas {
+          position: absolute;
+        }
+        #post {
+          margin-top: 50px;
+          position: absolute;
+            width: 90px;
+            height:828px;
+            margin-left: 297px;
+            background-color:#3c3c3c;
+            background-image:-webkit-linear-gradient(-40deg,rgba(0,0,0,0),rgba(255,255,255,0.1),rgba(0,0,0,0.2));
+            background-image:-moz-linear-gradient(-40deg,rgba(0,0,0,0),rgba(255,255,255,0.1),rgba(0,0,0,0.2));
+            background-image:-ms-linear-gradient(-40deg,rgba(0,0,0,0),rgba(255,255,255,0.1),rgba(0,0,0,0.2));
+            background-image:-o-linear-gradient(-40deg,rgba(0,0,0,0),rgba(255,255,255,0.1),rgba(0,0,0,0.2));
+            background-image:linear-gradient(-40deg,rgba(0,0,0,0),rgba(255,255,255,0.1),rgba(0,0,0,0.2));
+            -webkit-box-shadow:0 0 0 1px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.7);
+            -moz-box-shadow:0 0 0 1px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.7);
+            box-shadow:0 0 0 1px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.7);
+                    -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+    </style>
+</head>
+
+<body>
+    <canvas width="1580" height="900" id="canvas"></canvas>
+    <input id="slider"  >
+    <input id="gheight" >
+    <div id="post"></div>
+    <div id="stoplight">
+        <h3  id="count"></h3>
+        <div id="redLight"  @click="switchstoplight" class="circle"></div>
+        <div id="slowLight" @click="switchslowlight" class="circle">
+            <input id="time" v-bind:style="{ visibility: visibility }" @keyup.enter="submit" placeholder="DD:HH:MM:SS">
+        </div>
+        <div id="goLight"   @click="switchgolight" class="circle"></div>
+    </div>
     
-	</script>
+
+</body>
+
+<script>
+    (function(){
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBSyfqxU2cvGUYETjuUZbCwHcoq_1qYHlM",
+            authDomain: "plant-lights.firebaseapp.com",
+            databaseURL: "https://plant-lights.firebaseio.com",
+            projectId: "plant-lights",
+            storageBucket: "",
+            messagingSenderId: "666739629417"
+        };
+        firebase.initializeApp(config);
+
+        var database = firebase.database();
+
+        new Vue({
+          el: '#stoplight',
+          data: {
+            counter: 0,
+            visibility: "hidden"
+          },
+          mounted() {
+              this.readData();
+          },
+          methods: {
+              async writeData(choice, time) {
+                  firebase.database().ref('plant-lights').set({
+                      lights: choice,
+                      time: time,
+                  });
+              },
+              async readData() {
+                  let time = firebase.database().ref('plant-lights/time');
+                  let lights = firebase.database().ref('plant-lights/lights');
+                  
+                  time.once('value', data => { this.counter = Number(data.val())});
+                  lights.once('value', data => { this.init(data.val()) });
+                  if (this.counter <= window.localStorage.endTime) {
+                      this.timer();
+                  }
+              },
+              async init(state) {
+                  if (state == "OFF") {
+                      $("#redLight").css("background-color", "red");
+                  } else if (state == "ON") {
+                      $("#goLight").css("background-color", "green");
+                  } else if (state == "TIME") {
+                      $("#slowLight").css("background-color", "yellow");
+                      this.visibility = "visible";
+                  }
+              },
+              async switchstoplight() {
+                  this.writeData("OFF", 0)
+                  window.localStorage.endTime = 0;
+                  this.clear();
+                  $("#redLight").css("background-color", "red");
+              },
+              async switchslowlight() {
+                  this.clear();
+                  this.visibility = "visible";
+                  $("#slowLight").css("background-color", "yellow");
+              },
+              async switchgolight() {
+                  this.writeData("ON", 0)
+                  this.clear();
+                  $("#goLight").css("background-color", "green");
+              },
+              async clear() {
+                  $("#redLight").css("background-color", "black");
+                  $("#slowLight").css("background-color", "black");
+                  $("#goLight").css("background-color", "black");
+                  this.visibility = "hidden";
+              },
+              async timer() {
+                  var x = setInterval(() => {
+                      $("#slowLight").css("background-color", "black");
+                      $("#goLight").css("background-color", "green");
+                      this.visibility = "hidden";
+                      let time = +new Date() - this.counter - 1000;
+                      console.log(window.localStorage.endTime);
+                      console.log(time);
+                      this.writeData("ON", this.counter-1000);
+                      var distance = window.localStorage.endTime - (time);
+                      // Time calculations for days, hours, minutes and seconds
+                      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                      // Display the result in the element with id="demo"
+                      document.getElementById("count").style.display = "contents";
+                      document.getElementById("count").innerHTML = days + "d " + hours + "h " +
+                          minutes + "m " + seconds + "s ";
+                      // If the count down is finished, write some text 
+                      if ( time >= window.localStorage.endTime) {
+                          clearInterval(x);
+                          document.getElementById("count").style.display = "none";
+                          this.switchstoplight();
+                      }
+                  }, 1000);
+              },
+              async submit(event) {
+                  var re = /\s*:\s*/;
+                  var time = event.target.value.split(re);
+                  time = ((Number(time[0]) * 86400) + (Number(time[1]) * 3600) + (Number(time[2]) * 60) + Number(time[3])) * 1000;
+                  window.localStorage.endTime = time;
+                  this.counter = +new Date();
+                  this.timer();
+              }    
+          }
+        })
+    }());
+  
+  </script>
+  <script type="text/javascript" src="grass.js"></script>
+
 </html>
