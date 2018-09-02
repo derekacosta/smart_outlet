@@ -32,7 +32,7 @@ function wavingGrass() {
 		    iw = 2000;
 		  };
 		  img.style.height = '800px';
-		  // img.style.width = '900px';
+		  img.style.width = '1050px';
 		  img.src = 'https://www.clicktorelease.com/blog/how-to-make-clouds-with-css-3d/images/css3dclouds.jpg.webp';
 
 	/**
